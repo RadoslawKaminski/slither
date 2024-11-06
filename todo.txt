@@ -1,0 +1,3 @@
+kąt skręcania od rozmiaru
+cały snake jako jeden - optymalizacja - rysowanie grawędzi/gradient
+oczy

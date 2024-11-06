@@ -64,6 +64,16 @@ def move_snake(angle, snake_head):
     dy = math.sin(math.radians(angle)) * snake_speed
     return (snake_head[0] + dx, snake_head[1] + dy)
 
+# zmienna do śledzenia, czy używamy sterowania myszką
+using_mouse_control = True
+prev_mouse_pos = pygame.mouse.get_pos()  # Początkowa pozycja myszy
+
+# Funkcja do obliczania kąta między głową węża a kursorem myszy
+def calculate_angle_to_mouse(snake_head, mouse_pos):
+    dx = mouse_pos[0] - snake_head[0]
+    dy = mouse_pos[1] - snake_head[1]
+    return math.degrees(math.atan2(dy, dx))
+
 # Główna pętla gry
 clock = pygame.time.Clock()
 running = True
@@ -81,20 +91,46 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
                 turning = -turn_factor  # Obrót w lewo
+                using_mouse_control = False  # Przestawienie na sterowanie klawiaturą
             if event.key == pygame.K_RIGHT:
                 turning = turn_factor  # Obrót w prawo
+                using_mouse_control = False  # Przestawienie na sterowanie klawiaturą
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
                 turning = 0  # Zatrzymanie obrotu po puszczeniu strzałki
 
-    # Zmieniamy kąt węża w zależności od trzymania strzałki
-    angle += turning
+    # Pobranie aktualnej pozycji kursora myszy
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+
+    head_x, head_y = snake_body[0]
+
+    # Włączenie sterowania myszką przy poruszeniu jej pozycji
+    if (mouse_x, mouse_y) != prev_mouse_pos:
+        using_mouse_control = True  # Włączenie sterowania myszką, gdy jest poruszana
+    prev_mouse_pos = (mouse_x, mouse_y)  # Aktualizacja poprzedniej pozycji myszy
+
+    # Obliczanie kąta do kursora myszy tylko wtedy, gdy używamy myszki
+    if using_mouse_control:
+        # Obliczanie kąta do kursora
+        mouse_angle = calculate_angle_to_mouse((head_x - camera_x, head_y - camera_y), (mouse_x, mouse_y))
+        angle_difference = (mouse_angle - angle + 180) % 360 - 180  # Normalizacja różnicy do zakresu -180 do 180 stopni
+
+        # Zmieniamy kąt węża, aby stopniowo zbliżać go do kąta kursora
+        if angle_difference < -turn_factor:
+            angle -= turn_factor
+        elif angle_difference > turn_factor:
+            angle += turn_factor
+        else:
+            angle += angle_difference  # Zbliżenie się do kursora, gdy różnica jest mniejsza niż `turn_factor`
+
+    else:
+        # Jeśli używamy klawiatury, aktualizujemy kąt bez użycia myszy
+        angle += turning
 
     # Ograniczamy kąt węża, by nie zrobił za dużego skoku
     angle = angle % 360  # Kąt w zakresie 0-360°
 
     # Ruch węża: obliczanie nowej pozycji głowy na podstawie kąta (z stałą prędkością)
-    head_x, head_y = snake_body[0]
     new_head = move_snake(angle, (head_x, head_y))
 
     # Dodanie nowej głowy i usunięcie ogona (ruch węża)

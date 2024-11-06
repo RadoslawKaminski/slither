@@ -10,6 +10,9 @@ width, height = 1200, 900
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Snake Game - Slither.io Style")
 
+# Współczynnik zmiany skali kamery w zależności od rozmiaru węża
+zoom_factor = 0.003  # Im mniejsza wartość, tym mniejsze oddalanie
+
 # Parametry mapy
 map_size = 4000  # Mapa większa niż okno gry
 map_center = map_size / 2
@@ -25,8 +28,8 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 
 # Parametry węża
-initial_size = 20  # Początkowy rozmiar węża (większy od jedzenia)
-growth_rate = 1    # O ile wąż rośnie w każdym wymiarze po zjedzeniu
+initial_size = 30  # Początkowy rozmiar węża (większy od jedzenia)
+growth_rate = 0.2    # O ile wąż rośnie w każdym wymiarze po zjedzeniu
 snake_size = initial_size  # Rozmiar węża
 snake_speed = 12  # Stała prędkość węża
 turn_factor = 9
@@ -68,10 +71,16 @@ def move_snake(angle, snake_head):
 using_mouse_control = True
 prev_mouse_pos = pygame.mouse.get_pos()  # Początkowa pozycja myszy
 
-# Funkcja do obliczania kąta między głową węża a kursorem myszy
-def calculate_angle_to_mouse(snake_head, mouse_pos):
-    dx = mouse_pos[0] - snake_head[0]
-    dy = mouse_pos[1] - snake_head[1]
+# Funkcja do obliczania kąta między głową węża a kursorem myszy, uwzględniając skalę kamery
+def calculate_angle_to_mouse(snake_head, mouse_pos, scale):
+    # Skorygowanie pozycji kursora do skali i położenia kamery
+    adjusted_mouse_x = (mouse_pos[0] / scale) + camera_x
+    adjusted_mouse_y = (mouse_pos[1] / scale) + camera_y
+
+    # Obliczenie różnicy między głową a skorygowaną pozycją kursora
+    dx = adjusted_mouse_x - snake_head[0]
+    dy = adjusted_mouse_y - snake_head[1]
+
     return math.degrees(math.atan2(dy, dx))
 
 # Główna pętla gry
@@ -82,6 +91,12 @@ running = True
 food_positions = [generate_food() for _ in range(100)]  # 100 punktów jedzenia na mapie
 
 while running:
+
+    # Skala kamery zmienia się nieznacznie wraz z rozmiarem węża
+    base_scale = 1  # Bazowy współczynnik skali
+    scale = base_scale - snake_size * zoom_factor  # Skalowanie maleje z wielkością węża
+    #scale = max(0.1, scale)  # Ustawienie minimalnej skali, aby nie było za mało widoczne
+
     screen.fill(BLACK)  # Czyszczenie ekranu
 
     # Sprawdzenie zdarzeń
@@ -112,7 +127,7 @@ while running:
     # Obliczanie kąta do kursora myszy tylko wtedy, gdy używamy myszki
     if using_mouse_control:
         # Obliczanie kąta do kursora
-        mouse_angle = calculate_angle_to_mouse((head_x - camera_x, head_y - camera_y), (mouse_x, mouse_y))
+        mouse_angle = calculate_angle_to_mouse((head_x, head_y), (mouse_x, mouse_y), scale)
         angle_difference = (mouse_angle - angle + 180) % 360 - 180  # Normalizacja różnicy do zakresu -180 do 180 stopni
 
         # Zmieniamy kąt węża, aby stopniowo zbliżać go do kąta kursora
@@ -154,19 +169,28 @@ while running:
         print("Collision with boundary!")
         running = False  # Koniec gry
 
-    # Kamera podążająca za wężem (wąż zawsze w centrum)
-    camera_x = head_x - width // 2
-    camera_y = head_y - height // 2
+    # Ustawienie środka kamery względem pozycji głowy węża
+    camera_x = head_x - (width // 2) / scale
+    camera_y = head_y - (height // 2) / scale
 
-    # Rysowanie węża i jedzenia (przesuniętych względem kamery)
-    draw_snake(snake_body, snake_size, camera_x, camera_y)
+    # Rysowanie węża z uwzględnieniem skali
+    for segment in snake_body:
+        # Pozycjonowanie segmentów względem skalowanej kamery
+        x = (segment[0] - camera_x) * scale
+        y = (segment[1] - camera_y) * scale
+        pygame.draw.circle(screen, GREEN, (int(x), int(y)), int(snake_size // 2 * scale))
+
+    # Rysowanie jedzenia
     for food_pos in food_positions:
-        draw_food(food_pos, food_size, camera_x, camera_y)
+        x = (food_pos[0] - camera_x) * scale
+        y = (food_pos[1] - camera_y) * scale
+        pygame.draw.rect(screen, RED, pygame.Rect(int(x), int(y), int(food_size * scale), int(food_size * scale)))
 
-    # Rysowanie granicy mapy (czerwony okrąg) - uwzględnia przesunięcie kamery
+    # Rysowanie granicy mapy (skalowany czerwony okrąg)
     pygame.draw.circle(screen, RED,
-                       (map_size // 2 - camera_x, map_size // 2 - camera_y),
-                       boundary_radius, 2)
+                       (int((map_size // 2 - camera_x) * scale), int((map_size // 2 - camera_y) * scale)),
+                       int(boundary_radius * scale), 2)
+
 
     # Aktualizacja okna
     pygame.display.update()

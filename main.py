@@ -26,7 +26,7 @@ RED = (255, 0, 0)
 
 # Parametry węża
 initial_size = 20  # Początkowy rozmiar węża (większy od jedzenia)
-growth_rate = 2    # O ile wąż rośnie w każdym wymiarze po zjedzeniu
+growth_rate = 1    # O ile wąż rośnie w każdym wymiarze po zjedzeniu
 snake_size = initial_size  # Rozmiar węża
 snake_speed = 12  # Stała prędkość węża
 turn_factor = 9
@@ -102,7 +102,7 @@ while running:
 
     # Sprawdzanie kolizji z jedzeniem
     for food_pos in food_positions[:]:
-        if math.hypot(new_head[0] - food_pos[0], new_head[1] - food_pos[1]) < snake_size:
+        if math.hypot(new_head[0] - food_pos[0], new_head[1] - food_pos[1]) < (snake_size / 2 + food_size / 2):
             snake_body.append(snake_body[-1])  # Dodajemy segment ciała
             food_positions.remove(food_pos)  # Usuwamy zjedzone jedzenie
             food_positions.append(generate_food())  # Generujemy nowe jedzenie
@@ -110,11 +110,11 @@ while running:
             # Wąż rośnie w szerz i w długość
             snake_size += growth_rate  # Zwiększamy rozmiar węża
 
-    # Sprawdzanie kolizji z granicą (okrąg)
+    # Sprawdzanie kolizji z granicą (uwzględniając rozmiar węża)
     head_x, head_y = snake_body[0]
     distance_from_center = math.hypot(head_x - map_size // 2, head_y - map_size // 2)
 
-    if distance_from_center > boundary_radius:
+    if distance_from_center > boundary_radius - snake_size / 2:
         print("Collision with boundary!")
         running = False  # Koniec gry
 

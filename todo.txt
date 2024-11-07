@@ -1,3 +1,6 @@
 kąt skręcania od rozmiaru
 cały snake jako jeden - optymalizacja - rysowanie grawędzi/gradient
 oczy
+poprawa kratki przy skalowaniu
+fix podwójnego jedzenia w ruchu
+oddalanie

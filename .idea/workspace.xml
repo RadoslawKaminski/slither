@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4c1cca37-3b2b-46a3-99e0-54e16b058c5c" name="Changes" comment="dodano sterowanie myszką">
+    <list default="true" id="4c1cca37-3b2b-46a3-99e0-54e16b058c5c" name="Changes" comment="dopasowanie oddaolania">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/todo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/todo.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,7 +80,31 @@
       <option name="project" value="LOCAL" />
       <updated>1730921581316</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="dodano oddalanie kamery wraz ze wzrostem / skala">
+      <option name="closed" value="true" />
+      <created>1730925557568</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1730925557568</updated>
+    </task>
+    <task id="LOCAL-00005" summary="dodano exe i todo">
+      <option name="closed" value="true" />
+      <created>1730925855298</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1730925855298</updated>
+    </task>
+    <task id="LOCAL-00006" summary="dopasowanie oddaolania">
+      <option name="closed" value="true" />
+      <created>1731011451335</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1731011451335</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -97,6 +122,9 @@
     <MESSAGE value="initial slither commit | base working app" />
     <MESSAGE value="poprawiono kolizje z jedzeniem i granicą" />
     <MESSAGE value="dodano sterowanie myszką" />
-    <option name="LAST_COMMIT_MESSAGE" value="dodano sterowanie myszką" />
+    <MESSAGE value="dodano oddalanie kamery wraz ze wzrostem / skala" />
+    <MESSAGE value="dodano exe i todo" />
+    <MESSAGE value="dopasowanie oddaolania" />
+    <option name="LAST_COMMIT_MESSAGE" value="dopasowanie oddaolania" />
   </component>
 </project>

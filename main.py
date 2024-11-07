@@ -11,13 +11,16 @@ screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Snake Game - Slither.io Style")
 
 # Współczynnik zmiany skali kamery w zależności od rozmiaru węża
-zoom_factor = 0.0023  # Im mniejsza wartość, tym mniejsze oddalanie
+zoom_factor = 0.03  # Im mniejsza wartość, tym mniejsze oddalanie
 
 # Parametry mapy
 map_size = 4000  # Mapa większa niż okno gry
 map_center = map_size / 2
 camera_x, camera_y = 0, 0  # Początkowa pozycja kamery (wąż w centrum)
 camera_speed = 15  # Szybkość poruszania się kamery
+
+# Parametr dla kratki
+grid_spacing = 100  # Stała odległość między liniami kratki (przed skalowaniem)
 
 # Promień granicy mapy
 boundary_radius = map_center
@@ -29,13 +32,13 @@ RED = (255, 0, 0)
 
 # Parametry węża
 initial_size = 30  # Początkowy rozmiar węża (większy od jedzenia)
-growth_rate = 0.2    # O ile wąż rośnie w każdym wymiarze po zjedzeniu
+growth_rate = 0.15    # O ile wąż rośnie w każdym wymiarze po zjedzeniu
 snake_size = initial_size  # Rozmiar węża
 snake_speed = 12  # Stała prędkość węża
 turn_factor = 9
 
 # Parametry jedzenia
-food_size = 9  # Rozmiar jedzenia (mniejsze niż wąż)
+food_size = 15  # Rozmiar jedzenia (mniejsze niż wąż)
 
 # Grubość węża
 snake_body = [(map_center, map_center)]  # Wąż zaczyna na środku mapy (center of the map)
@@ -55,11 +58,14 @@ def draw_food(food_pos, food_size, offset_x, offset_y):
 # Funkcja do generowania jedzenia w losowym miejscu wewnątrz granicy
 def generate_food():
     # Losowanie punktu w obrębie koła
-    angle = random.uniform(0, 2 * math.pi)
-    radius = random.uniform(0, boundary_radius - food_size)
-    x = map_size / 2 + radius * math.cos(angle)
-    y = map_size / 2 + radius * math.sin(angle)
-    return (x, y)
+    x = random.uniform(0, map_size-50)
+    y = random.uniform(0, map_size-50)
+    from_center = math.hypot(x - map_size // 2, y - map_size // 2)
+    if from_center > boundary_radius - 50 - food_size / 2:
+        return generate_food()
+    else:
+        return (x, y)
+
 
 # Funkcja do obliczania ruchu węża z stałą prędkością
 def move_snake(angle, snake_head):
@@ -88,16 +94,16 @@ clock = pygame.time.Clock()
 running = True
 
 # Lista pozycji jedzenia
-food_positions = [generate_food() for _ in range(4000)]  # 100 punktów jedzenia na mapie
+food_positions = [generate_food() for _ in range(400)]  # 100 punktów jedzenia na mapie
 
 while running:
 
+    screen.fill(BLACK)  # Czyszczenie ekranu
+
     # Skala kamery zmienia się nieznacznie wraz z rozmiarem węża
     base_scale = 1  # Bazowy współczynnik skali
-    scale = base_scale - snake_size * zoom_factor  # Skalowanie maleje z wielkością węża
-    scale = max(0.15, scale)  # Ustawienie minimalnej skali, aby nie było za mało widoczne
-
-    screen.fill(BLACK)  # Czyszczenie ekranu
+    scale = base_scale - math.sqrt(snake_size) * zoom_factor  # Skalowanie maleje z wielkością węża (math.log?)
+    scale = max(0.2, scale)  # Ustawienie minimalnej skali, aby nie było za mało widoczne
 
     # Sprawdzenie zdarzeń
     for event in pygame.event.get():
@@ -162,7 +168,6 @@ while running:
             snake_size += growth_rate  # Zwiększamy rozmiar węża
 
     # Sprawdzanie kolizji z granicą (uwzględniając rozmiar węża)
-    head_x, head_y = snake_body[0]
     distance_from_center = math.hypot(head_x - map_size // 2, head_y - map_size // 2)
 
     if distance_from_center > boundary_radius - snake_size / 2:
@@ -172,6 +177,23 @@ while running:
     # Ustawienie środka kamery względem pozycji głowy węża
     camera_x = head_x - (width // 2) / scale
     camera_y = head_y - (height // 2) / scale
+
+    # Skorygowana odległość między liniami w skali
+    scaled_grid_spacing = int(grid_spacing * scale)
+
+    # Ustal początkową pozycję kratki względem centrum mapy (a nie kamery)
+    grid_offset_x = (map_center - camera_x) * scale
+    grid_offset_y = (map_center - camera_y) * scale
+
+    # Obliczamy początkową pozycję dla linii kratki na podstawie środka mapy
+    start_x = grid_offset_x % scaled_grid_spacing
+    start_y = grid_offset_y % scaled_grid_spacing
+
+    # Rysowanie linii kratki
+    for x in range(int(start_x), width, scaled_grid_spacing):
+        pygame.draw.line(screen, (50, 50, 50), (x, 0), (x, height))
+    for y in range(int(start_y), height, scaled_grid_spacing):
+        pygame.draw.line(screen, (50, 50, 50), (0, y), (width, y))
 
     # Rysowanie węża z uwzględnieniem skali
     for segment in snake_body:
@@ -184,13 +206,12 @@ while running:
     for food_pos in food_positions:
         x = (food_pos[0] - camera_x) * scale
         y = (food_pos[1] - camera_y) * scale
-        pygame.draw.rect(screen, RED, pygame.Rect(int(x), int(y), int(food_size * scale), int(food_size * scale)))
+        pygame.draw.circle(screen, RED, (int(x), int(y)), int(food_size // 2 * scale))
 
     # Rysowanie granicy mapy (skalowany czerwony okrąg)
     pygame.draw.circle(screen, RED,
                        (int((map_size // 2 - camera_x) * scale), int((map_size // 2 - camera_y) * scale)),
                        int(boundary_radius * scale), 2)
-
 
     # Aktualizacja okna
     pygame.display.update()

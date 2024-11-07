@@ -11,7 +11,7 @@ screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Snake Game - Slither.io Style")
 
 # Współczynnik zmiany skali kamery w zależności od rozmiaru węża
-zoom_factor = 0.003  # Im mniejsza wartość, tym mniejsze oddalanie
+zoom_factor = 0.0023  # Im mniejsza wartość, tym mniejsze oddalanie
 
 # Parametry mapy
 map_size = 4000  # Mapa większa niż okno gry
@@ -88,14 +88,14 @@ clock = pygame.time.Clock()
 running = True
 
 # Lista pozycji jedzenia
-food_positions = [generate_food() for _ in range(100)]  # 100 punktów jedzenia na mapie
+food_positions = [generate_food() for _ in range(4000)]  # 100 punktów jedzenia na mapie
 
 while running:
 
     # Skala kamery zmienia się nieznacznie wraz z rozmiarem węża
     base_scale = 1  # Bazowy współczynnik skali
     scale = base_scale - snake_size * zoom_factor  # Skalowanie maleje z wielkością węża
-    #scale = max(0.1, scale)  # Ustawienie minimalnej skali, aby nie było za mało widoczne
+    scale = max(0.15, scale)  # Ustawienie minimalnej skali, aby nie było za mało widoczne
 
     screen.fill(BLACK)  # Czyszczenie ekranu
 

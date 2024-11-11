@@ -57,15 +57,15 @@ def draw_snake(snake_body, snake_size, offset_x, offset_y):
 
 # Funkcja do rysowania oczu węża
 def draw_eyes(snake_head, angle, offset_x, offset_y, scale):
-    eye_offset_distance = 0.5 * snake_size * scale
+    eye_offset_distance = 0.25 * snake_size
     eye_radius = int(0.2 * snake_size * scale)  # Rozmiar białego oka
     pupil_radius = int(0.1 * snake_size * scale)  # Rozmiar czarnej źrenicy
 
     # Pozycje oczu po lewej i prawej stronie głowy
-    left_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle + 30))
-    left_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle + 30))
-    right_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle - 30))
-    right_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle - 30))
+    left_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle + 40))
+    left_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle + 40))
+    right_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle - 40))
+    right_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle - 40))
 
     # Korekcja pozycji oczu względem kamery i skali
     left_eye_x = (left_eye_x - offset_x) * scale

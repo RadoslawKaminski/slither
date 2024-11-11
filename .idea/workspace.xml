@@ -4,10 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4c1cca37-3b2b-46a3-99e0-54e16b058c5c" name="Changes" comment="dopasowanie oddaolania">
+    <list default="true" id="4c1cca37-3b2b-46a3-99e0-54e16b058c5c" name="Changes" comment="todo update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/todo.txt" beforeDir="false" afterPath="$PROJECT_DIR$/todo.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,7 +103,31 @@
       <option name="project" value="LOCAL" />
       <updated>1731011451335</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="dodano kratkę, poprawiono skalowanie i generowanie jedzenia">
+      <option name="closed" value="true" />
+      <created>1731020436863</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1731020436863</updated>
+    </task>
+    <task id="LOCAL-00008" summary="dodano kratkę, poprawiono skalowanie i generowanie jedzenia">
+      <option name="closed" value="true" />
+      <created>1731020522543</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1731020522543</updated>
+    </task>
+    <task id="LOCAL-00009" summary="todo update">
+      <option name="closed" value="true" />
+      <created>1731020797777</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1731020797777</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -125,6 +148,8 @@
     <MESSAGE value="dodano oddalanie kamery wraz ze wzrostem / skala" />
     <MESSAGE value="dodano exe i todo" />
     <MESSAGE value="dopasowanie oddaolania" />
-    <option name="LAST_COMMIT_MESSAGE" value="dopasowanie oddaolania" />
+    <MESSAGE value="dodano kratkę, poprawiono skalowanie i generowanie jedzenia" />
+    <MESSAGE value="todo update" />
+    <option name="LAST_COMMIT_MESSAGE" value="todo update" />
   </component>
 </project>

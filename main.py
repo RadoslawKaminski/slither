@@ -94,7 +94,7 @@ clock = pygame.time.Clock()
 running = True
 
 # Lista pozycji jedzenia
-food_positions = [generate_food() for _ in range(400)]  # 100 punktów jedzenia na mapie
+food_positions = [generate_food() for _ in range(4000)]  # 100 punktów jedzenia na mapie
 
 while running:
 
@@ -178,22 +178,33 @@ while running:
     camera_x = head_x - (width // 2) / scale
     camera_y = head_y - (height // 2) / scale
 
-    # Skorygowana odległość między liniami w skali
-    scaled_grid_spacing = int(grid_spacing * scale)
+    # Obliczamy, ile linii kratki jest widocznych przed przeskalowaniem
+    visible_width = width / scale
+    visible_height = height / scale
 
-    # Ustal początkową pozycję kratki względem centrum mapy (a nie kamery)
-    grid_offset_x = (map_center - camera_x) * scale
-    grid_offset_y = (map_center - camera_y) * scale
+    # Obliczamy, od którego punktu zacząć rysowanie kratki w przestrzeni świata
+    world_start_x = camera_x - (camera_x % grid_spacing)
+    world_start_y = camera_y - (camera_y % grid_spacing)
 
-    # Obliczamy początkową pozycję dla linii kratki na podstawie środka mapy
-    start_x = grid_offset_x % scaled_grid_spacing
-    start_y = grid_offset_y % scaled_grid_spacing
+    # Obliczamy, ile linii potrzebujemy
+    lines_x = int(visible_width / grid_spacing) + 2
+    lines_y = int(visible_height / grid_spacing) + 2
 
-    # Rysowanie linii kratki
-    for x in range(int(start_x), width, scaled_grid_spacing):
-        pygame.draw.line(screen, (50, 50, 50), (x, 0), (x, height))
-    for y in range(int(start_y), height, scaled_grid_spacing):
-        pygame.draw.line(screen, (50, 50, 50), (0, y), (width, y))
+    # Rysujemy linie pionowe
+    for i in range(lines_x):
+        world_x = world_start_x + (i * grid_spacing)
+        screen_x = (world_x - camera_x) * scale
+        pygame.draw.line(screen, (50, 50, 50),
+                         (int(screen_x), 0),
+                         (int(screen_x), height))
+
+    # Rysujemy linie poziome
+    for i in range(lines_y):
+        world_y = world_start_y + (i * grid_spacing)
+        screen_y = (world_y - camera_y) * scale
+        pygame.draw.line(screen, (50, 50, 50),
+                         (0, int(screen_y)),
+                         (width, int(screen_y)))
 
     # Rysowanie węża z uwzględnieniem skali
     for segment in snake_body:

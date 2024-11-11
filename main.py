@@ -272,9 +272,9 @@ while running:
 
     # Rysowanie dużego jedzenia w głównej pętli gry
     for large_food_pos in large_food_positions:
-        pygame.draw.circle(screen, (255, 140, 0),
-                           (int((large_food_pos[0] - camera_x) * scale), int((large_food_pos[1] - camera_y) * scale)),
-                           large_food_size // 2)
+        l_x = int((large_food_pos[0] - camera_x) * scale)
+        l_y = int((large_food_pos[1] - camera_y) * scale)
+        pygame.draw.circle(screen, (255, 140, 0),(l_x, l_y), large_food_size // 2 * scale)
 
     # Rysowanie granicy mapy (skalowany czerwony okrąg)
     pygame.draw.circle(screen, RED,

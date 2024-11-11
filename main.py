@@ -51,6 +51,41 @@ def draw_snake(snake_body, snake_size, offset_x, offset_y):
         # Przesunięcie węża względem offsetu kamery
         pygame.draw.circle(screen, GREEN, (segment[0] - offset_x, segment[1] - offset_y), snake_size // 2)
 
+# Funkcja do rysowania oczu węża
+def draw_eyes(snake_head, angle, offset_x, offset_y, scale):
+    eye_offset_distance = 0.5 * snake_size * scale
+    eye_radius = int(0.2 * snake_size * scale)  # Rozmiar białego oka
+    pupil_radius = int(0.1 * snake_size * scale)  # Rozmiar czarnej źrenicy
+
+    # Pozycje oczu po lewej i prawej stronie głowy
+    left_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle + 30))
+    left_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle + 30))
+    right_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle - 30))
+    right_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle - 30))
+
+    # Korekcja pozycji oczu względem kamery i skali
+    left_eye_x = (left_eye_x - offset_x) * scale
+    left_eye_y = (left_eye_y - offset_y) * scale
+    right_eye_x = (right_eye_x - offset_x) * scale
+    right_eye_y = (right_eye_y - offset_y) * scale
+
+    # Obliczanie pozycji źrenic (lekko przesunięte w kierunku kursora)
+    pupil_offset = 0.4 * eye_radius  # Przesunięcie źrenicy w kierunku kursora
+    pupil_angle = math.radians(calculate_angle_to_mouse(snake_head, pygame.mouse.get_pos(), scale))
+
+    # Pozycje źrenic
+    left_pupil_x = left_eye_x + pupil_offset * math.cos(pupil_angle)
+    left_pupil_y = left_eye_y + pupil_offset * math.sin(pupil_angle)
+    right_pupil_x = right_eye_x + pupil_offset * math.cos(pupil_angle)
+    right_pupil_y = right_eye_y + pupil_offset * math.sin(pupil_angle)
+
+    # Rysowanie oczu
+    pygame.draw.circle(screen, (255, 255, 255), (int(left_eye_x), int(left_eye_y)), eye_radius)
+    pygame.draw.circle(screen, (255, 255, 255), (int(right_eye_x), int(right_eye_y)), eye_radius)
+    # Rysowanie źrenic
+    pygame.draw.circle(screen, (0, 0, 0), (int(left_pupil_x), int(left_pupil_y)), pupil_radius)
+    pygame.draw.circle(screen, (0, 0, 0), (int(right_pupil_x), int(right_pupil_y)), pupil_radius)
+
 # Funkcja do rysowania jedzenia
 def draw_food(food_pos, food_size, offset_x, offset_y):
     pygame.draw.rect(screen, RED, pygame.Rect(food_pos[0] - offset_x, food_pos[1] - offset_y, food_size, food_size))
@@ -67,7 +102,7 @@ def generate_food():
         return (x, y)
 
 
-# Funkcja do obliczania ruchu węża z stałą prędkością
+# Funkcja do obliczania ruchu węża z stałą prędkością (głowy)
 def move_snake(angle, snake_head):
     dx = math.cos(math.radians(angle)) * snake_speed
     dy = math.sin(math.radians(angle)) * snake_speed
@@ -212,6 +247,8 @@ while running:
         x = (segment[0] - camera_x) * scale
         y = (segment[1] - camera_y) * scale
         pygame.draw.circle(screen, GREEN, (int(x), int(y)), int(snake_size // 2 * scale))
+
+    draw_eyes(new_head, angle, camera_x, camera_y, scale)
 
     # Rysowanie jedzenia
     for food_pos in food_positions:

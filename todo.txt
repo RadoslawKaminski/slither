@@ -1,6 +1,5 @@
 kąt skręcania od rozmiaru
 cały snake jako jeden - optymalizacja - rysowanie grawędzi/gradient
-oczy
 fix ruch kratki przy skalowaniu
 fix podwójnego jedzenia w ruchu
 fix zbyt szybkie oddalanie przy dużej wielkości snake (log?)

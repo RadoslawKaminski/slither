@@ -40,6 +40,9 @@ turn_factor = 9
 # Parametry jedzenia
 food_size = 15  # Rozmiar jedzenia (mniejsze niż wąż)
 segments_to_add = 0 # Zmienna przechowująca liczbę segmentów do dodania
+# Parametry dużego jedzenia
+large_food_size = 25  # Większy rozmiar dużego jedzenia
+large_food_value = 3  # Dodaje wartość pięciu standardowych jedzeń
 
 # Grubość węża
 snake_body = [(map_center, map_center)]  # Wąż zaczyna na środku mapy (center of the map)
@@ -87,18 +90,13 @@ def draw_eyes(snake_head, angle, offset_x, offset_y, scale):
     pygame.draw.circle(screen, (0, 0, 0), (int(left_pupil_x), int(left_pupil_y)), pupil_radius)
     pygame.draw.circle(screen, (0, 0, 0), (int(right_pupil_x), int(right_pupil_y)), pupil_radius)
 
-# Funkcja do rysowania jedzenia
-def draw_food(food_pos, food_size, offset_x, offset_y):
-    pygame.draw.rect(screen, RED, pygame.Rect(food_pos[0] - offset_x, food_pos[1] - offset_y, food_size, food_size))
-
 # Funkcja do generowania jedzenia w losowym miejscu wewnątrz granicy
-def generate_food():
-    # Losowanie punktu w obrębie koła
+def generate_food(is_large=False):
     x = random.uniform(0, map_size-50)
     y = random.uniform(0, map_size-50)
     from_center = math.hypot(x - map_size // 2, y - map_size // 2)
-    if from_center > boundary_radius - 50 - food_size / 2:
-        return generate_food()
+    if from_center > boundary_radius - 50 - (large_food_size if is_large else food_size) / 2:
+        return generate_food(is_large)
     else:
         return (x, y)
 
@@ -130,7 +128,8 @@ clock = pygame.time.Clock()
 running = True
 
 # Lista pozycji jedzenia
-food_positions = [generate_food() for _ in range(4000)]  # 100 punktów jedzenia na mapie
+food_positions = [generate_food() for _ in range(400)]  # x punktów jedzenia na mapie
+large_food_positions = [generate_food(is_large=True) for _ in range(1000)]  # x dużych jedzeń
 
 while running:
 
@@ -203,6 +202,15 @@ while running:
             # Wąż rośnie w szerz i w długość
             snake_size += growth_rate  # Zwiększamy rozmiar węża
 
+    # Sprawdzanie kolizji z dużym jedzeniem
+    for large_food_pos in large_food_positions[:]:
+        if math.hypot(new_head[0] - large_food_pos[0], new_head[1] - large_food_pos[1]) < (
+                snake_size / 2 + large_food_size / 2):
+            segments_to_add += large_food_value  # Dodajemy kilka segmentów do kolejki
+            large_food_positions.remove(large_food_pos)
+            large_food_positions.append(generate_food(is_large=True))
+            snake_size += growth_rate * large_food_value
+
     # Dodawanie segmentów w każdej iteracji, jeśli są segmenty do dodania
     if segments_to_add > 0:
         snake_body.append(snake_body[-1])  # Dodanie segmentu na końcu węża
@@ -261,6 +269,12 @@ while running:
         x = (food_pos[0] - camera_x) * scale
         y = (food_pos[1] - camera_y) * scale
         pygame.draw.circle(screen, RED, (int(x), int(y)), int(food_size // 2 * scale))
+
+    # Rysowanie dużego jedzenia w głównej pętli gry
+    for large_food_pos in large_food_positions:
+        pygame.draw.circle(screen, (255, 140, 0),
+                           (int((large_food_pos[0] - camera_x) * scale), int((large_food_pos[1] - camera_y) * scale)),
+                           large_food_size // 2)
 
     # Rysowanie granicy mapy (skalowany czerwony okrąg)
     pygame.draw.circle(screen, RED,

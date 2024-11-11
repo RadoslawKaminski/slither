@@ -49,12 +49,6 @@ snake_body = [(map_center, map_center)]  # Wąż zaczyna na środku mapy (center
 angle = 0  # Kąt węża, początkowo skierowany w prawo
 turning = 0  # Kontrolowanie, czy strzałka jest trzymana
 
-# Funkcja do rysowania węża
-def draw_snake(snake_body, snake_size, offset_x, offset_y):
-    for segment in snake_body:
-        # Przesunięcie węża względem offsetu kamery
-        pygame.draw.circle(screen, GREEN, (segment[0] - offset_x, segment[1] - offset_y), snake_size // 2)
-
 # Funkcja do rysowania oczu węża
 def draw_eyes(snake_head, angle, offset_x, offset_y, scale):
     eye_offset_distance = 0.25 * snake_size

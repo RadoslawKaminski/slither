@@ -39,6 +39,7 @@ turn_factor = 9
 
 # Parametry jedzenia
 food_size = 15  # Rozmiar jedzenia (mniejsze niż wąż)
+segments_to_add = 0 # Zmienna przechowująca liczbę segmentów do dodania
 
 # Grubość węża
 snake_body = [(map_center, map_center)]  # Wąż zaczyna na środku mapy (center of the map)
@@ -195,12 +196,17 @@ while running:
     # Sprawdzanie kolizji z jedzeniem
     for food_pos in food_positions[:]:
         if math.hypot(new_head[0] - food_pos[0], new_head[1] - food_pos[1]) < (snake_size / 2 + food_size / 2):
-            snake_body.append(snake_body[-1])  # Dodajemy segment ciała
+            segments_to_add += 1  # Dodajemy jeden segment do kolejki do dodania
             food_positions.remove(food_pos)  # Usuwamy zjedzone jedzenie
             food_positions.append(generate_food())  # Generujemy nowe jedzenie
 
             # Wąż rośnie w szerz i w długość
             snake_size += growth_rate  # Zwiększamy rozmiar węża
+
+    # Dodawanie segmentów w każdej iteracji, jeśli są segmenty do dodania
+    if segments_to_add > 0:
+        snake_body.append(snake_body[-1])  # Dodanie segmentu na końcu węża
+        segments_to_add -= 1  # Zmniejszenie liczby segmentów do dodania
 
     # Sprawdzanie kolizji z granicą (uwzględniając rozmiar węża)
     distance_from_center = math.hypot(head_x - map_size // 2, head_y - map_size // 2)

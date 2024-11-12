@@ -12,6 +12,7 @@ pygame.display.set_caption("Snake Game - Slither.io Style")
 
 # Współczynnik zmiany skali kamery w zależności od rozmiaru węża
 zoom_factor = 0.03  # Im mniejsza wartość, tym mniejsze oddalanie
+current_scale = 1
 
 # Parametry mapy
 map_size = 4000
@@ -75,11 +76,12 @@ def draw_eyes(snake_head, angle, offset_x, offset_y, scale):
     eye_offset_distance = 0.25 * snake_size
     eye_radius = int(0.2 * snake_size * scale)  # Rozmiar białego oka
     pupil_radius = int(0.13 * snake_size * scale)  # Rozmiar czarnej źrenicy
+    eyes_angle = 50
 
-    left_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle + 40))
-    left_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle + 40))
-    right_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle - 40))
-    right_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle - 40))
+    left_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle + eyes_angle))
+    left_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle + eyes_angle))
+    right_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle - eyes_angle))
+    right_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle - eyes_angle))
 
     left_eye_x = (left_eye_x - offset_x) * scale
     left_eye_y = (left_eye_y - offset_y) * scale
@@ -136,8 +138,12 @@ while running:
     screen.fill(BLACK)
 
     base_scale = 1
-    scale = base_scale - math.sqrt(snake_size) * zoom_factor
-    scale = max(0.2, scale)
+    target_scale = base_scale - math.sqrt(snake_size) * zoom_factor
+    target_scale = max(0.2, target_scale)
+
+    # Interpolacja skali
+    current_scale = current_scale + (target_scale - current_scale) * interpolation_speed
+    scale = current_scale
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

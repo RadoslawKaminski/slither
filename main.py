@@ -5,6 +5,8 @@ import math
 # Inicjalizacja Pygame
 pygame.init()
 
+interpolation_speed = 0.1
+
 # Ustawienia okna
 width, height = 1500, 1000
 screen = pygame.display.set_mode((width, height))
@@ -40,8 +42,8 @@ snake_speed = 12
 # Parametry jedzenia
 food_size = 15
 segments_to_add = 0
-large_food_size = 25
-large_food_value = 30
+large_food_size = 30
+large_food_value = 5
 
 # Grubość węża
 snake_body = [(map_center, map_center)]  # Wąż zaczyna na środku mapy
@@ -50,13 +52,28 @@ turning = 0  # Kontrolowanie, czy strzałka jest trzymana
 
 
 class Food:
-    def __init__(self, position, is_large=False):
-        self.position = position
+    def __init__(self, base_position, is_large=False):
+        self.base_position = self.position = self.target_position = base_position
         self.is_large = is_large
         self.size = large_food_size if is_large else food_size
-        self.color = (255, 140, 0) if is_large else RED
+        self.color = (random.randint(20, 240), random.randint(20, 240), random.randint(20, 240))
+        self.speed = random.random()
+        self.pos_change = [0, 0]
 
     def draw(self, screen, camera_x, camera_y, scale):
+        if round(self.position[0]) == self.target_position[0] and round(self.position[1]) == self.target_position[1]:
+            self.target_position = (random.randint(self.base_position[0] - 30, self.base_position[0] + 30),
+                                    random.randint(self.base_position[1] - 30, self.base_position[1] + 30))
+        else:
+            if self.target_position[0] > self.position[0]:
+                self.pos_change[0] = min(self.target_position[0] - self.position[0], self.speed)
+            else: self.pos_change[0] = max(self.target_position[0] - self.position[0], -self.speed)
+
+            if self.target_position[1] > self.position[1]:
+                self.pos_change[1] = min(self.target_position[1] - self.position[1], self.speed)
+            else: self.pos_change[1] = max(self.target_position[1] - self.position[1], -self.speed)
+
+            self.position = ((self.position[0] + self.pos_change[0]), (self.position[1] + self.pos_change[1]))
         x = (self.position[0] - camera_x) * scale
         y = (self.position[1] - camera_y) * scale
         pygame.draw.circle(screen, self.color, (int(x), int(y)), int(self.size // 2 * scale))
@@ -131,7 +148,6 @@ large_food_list = [generate_food(is_large=True) for _ in range(100)]
 # Zmienne do interpolacji ruchu kamery
 target_camera_x = camera_x
 target_camera_y = camera_y
-interpolation_speed = 0.1
 
 while running:
     screen.fill(BLACK)
@@ -238,10 +254,10 @@ while running:
         y = (segment[1] - camera_y) * scale
         scaled_segment_radius = int(snake_size // 2 * scale)
         color_radius = scaled_segment_radius / 10
-        color_change = 240/10
+        color_change = 240 / 10
         for i in reversed(range(1, 10)):
-            circle_radius = color_radius*i
-            pygame.draw.circle(screen, (0, 255-color_change*i, 0), (int(x), int(y)), circle_radius)
+            circle_radius = color_radius * i
+            pygame.draw.circle(screen, (0, 255 - color_change * i, 0), (int(x), int(y)), circle_radius)
 
     draw_eyes(new_head, angle, camera_x, camera_y, scale)
 

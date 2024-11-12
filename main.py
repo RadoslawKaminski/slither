@@ -55,8 +55,6 @@ class Food:
         self.is_large = is_large
         self.size = large_food_size if is_large else food_size
         self.color = (255, 140, 0) if is_large else RED
-        # Dodajemy offset do renderowania
-        self.render_offset = (0, 0)
 
     def draw(self, screen, camera_x, camera_y, scale):
         x = (self.position[0] - camera_x) * scale
@@ -65,8 +63,8 @@ class Food:
 
 
 def generate_food(is_large=False):
-    x = random.uniform(0, map_size - 50)
-    y = random.uniform(0, map_size - 50)
+    x = random.randint(0, map_size - 50)
+    y = random.randint(0, map_size - 50)
     from_center = math.hypot(x - map_size // 2, y - map_size // 2)
     if from_center > boundary_radius - 50 - (large_food_size if is_large else food_size) / 2:
         return generate_food(is_large)

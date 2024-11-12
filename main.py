@@ -53,30 +53,66 @@ turning = 0  # Kontrolowanie, czy strzałka jest trzymana
 
 class Food:
     def __init__(self, base_position, is_large=False):
-        self.base_position = self.position = self.target_position = base_position
+        self.base_position = self.position = base_position
         self.is_large = is_large
         self.size = large_food_size if is_large else food_size
         self.color = (random.randint(20, 240), random.randint(20, 240), random.randint(20, 240))
-        self.speed = random.random()
-        self.pos_change = [0, 0]
+        self.speed = random.randint(3, 7) / 10
+        self.target_angle = self.angle = random.randint(0, 360)
+        self.state = "wandering"  # może być "wandering" lub "returning"
+        self.turn_direction = random.choice([-1, 1])  # kierunek skrętu
+        self.turn_timer = random.randint(20, 60)  # za ile zmienić kierunek skrętu
+        self.turn_speed = random.uniform(5, 9) # jak szybko skręca
 
-    def draw(self, screen, camera_x, camera_y, scale):
-        if round(self.position[0]) == self.target_position[0] and round(self.position[1]) == self.target_position[1]:
-            self.target_position = (random.randint(self.base_position[0] - 30, self.base_position[0] + 30),
-                                    random.randint(self.base_position[1] - 30, self.base_position[1] + 30))
+    def calculate_angle_to_point(self, target):
+        dx = target[0] - self.position[0]
+        dy = target[1] - self.position[1]
+        return math.degrees(math.atan2(dy, dx))
+
+    def calculate_distance_to_base(self):
+        dx = self.position[0] - self.base_position[0]
+        dy = self.position[1] - self.base_position[1]
+        return math.sqrt(dx * dx + dy * dy)
+
+    def draw(self, _screen, _camera_x, _camera_y, _scale):
+
+        distance_to_base = self.calculate_distance_to_base()
+        if distance_to_base > 40:  # Jeśli za daleko od bazy
+            self.state = "returning"
+        elif self.state == "returning" and distance_to_base < 5:  # Jeśli wróciliśmy wystarczająco blisko
+            self.state = "wandering"
+            self.turn_timer = random.randint(10, 60)
+
+        # Zachowanie zależne od stanu
+        if self.state == "wandering":
+            # Zmniejsz timer i ewentualnie zmień kierunek skrętu
+            self.turn_timer -= 1
+            if self.turn_timer <= 0:
+                self.turn_direction *= -1  # Zmień kierunek skrętu
+                self.turn_timer = random.randint(20, 60)  # Resetuj timer
+                self.turn_speed = random.uniform(5, 9)  # Nowa prędkość skrętu
+
+            # Ciągłe skręcanie
+            self.target_angle += self.turn_speed * self.turn_direction
+
+        else:  # returning
+            self.target_angle = self.calculate_angle_to_point(self.base_position)
+
+        angle_diff = (self.target_angle - self.angle + 180) % 360 - 180
+
+        if abs(angle_diff) > self.turn_speed:
+            if angle_diff < 0:
+                self.angle -= self.turn_speed
+            else:
+                self.angle += self.turn_speed
         else:
-            if self.target_position[0] > self.position[0]:
-                self.pos_change[0] = min(self.target_position[0] - self.position[0], self.speed)
-            else: self.pos_change[0] = max(self.target_position[0] - self.position[0], -self.speed)
+            self.angle = self.target_angle
 
-            if self.target_position[1] > self.position[1]:
-                self.pos_change[1] = min(self.target_position[1] - self.position[1], self.speed)
-            else: self.pos_change[1] = max(self.target_position[1] - self.position[1], -self.speed)
-
-            self.position = ((self.position[0] + self.pos_change[0]), (self.position[1] + self.pos_change[1]))
-        x = (self.position[0] - camera_x) * scale
-        y = (self.position[1] - camera_y) * scale
-        pygame.draw.circle(screen, self.color, (int(x), int(y)), int(self.size // 2 * scale))
+        self.position = (self.position[0] + math.cos(math.radians(self.angle)) * self.speed,
+                         self.position[1] + math.sin(math.radians(self.angle)) * self.speed)
+        x = (self.position[0] - _camera_x) * _scale
+        y = (self.position[1] - _camera_y) * _scale
+        pygame.draw.circle(_screen, self.color, (int(x), int(y)), int(self.size // 2 * _scale))
 
 
 def generate_food(is_large=False):
@@ -134,7 +170,7 @@ def calculate_angle_to_mouse(snake_head, mouse_pos, scale):
     adjusted_mouse_y = (mouse_pos[1] / scale) + camera_y
     dx = adjusted_mouse_x - snake_head[0]
     dy = adjusted_mouse_y - snake_head[1]
-    return math.degrees(math.atan2(dy, dx))
+    return math.degrees(math.atan2(dy, dx)) % 360
 
 
 # Główna pętla gry

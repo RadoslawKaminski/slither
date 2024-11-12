@@ -6,7 +6,7 @@ import math
 pygame.init()
 
 # Ustawienia okna
-width, height = 1200, 900
+width, height = 1500, 1000
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Snake Game - Slither.io Style")
 
@@ -41,7 +41,7 @@ turn_factor = 9
 food_size = 15
 segments_to_add = 0
 large_food_size = 25
-large_food_value = 3
+large_food_value = 30
 
 # Grubość węża
 snake_body = [(map_center, map_center)]  # Wąż zaczyna na środku mapy
@@ -74,7 +74,7 @@ def generate_food(is_large=False):
 def draw_eyes(snake_head, angle, offset_x, offset_y, scale):
     eye_offset_distance = 0.25 * snake_size
     eye_radius = int(0.2 * snake_size * scale)  # Rozmiar białego oka
-    pupil_radius = int(0.1 * snake_size * scale)  # Rozmiar czarnej źrenicy
+    pupil_radius = int(0.13 * snake_size * scale)  # Rozmiar czarnej źrenicy
 
     left_eye_x = snake_head[0] + eye_offset_distance * math.cos(math.radians(angle + 40))
     left_eye_y = snake_head[1] + eye_offset_distance * math.sin(math.radians(angle + 40))
@@ -125,7 +125,12 @@ running = True
 
 # Inicjalizacja jedzenia jako obiektów klasy Food
 food_list = [generate_food() for _ in range(400)]
-large_food_list = [generate_food(is_large=True) for _ in range(1000)]
+large_food_list = [generate_food(is_large=True) for _ in range(100)]
+
+# Zmienne do interpolacji ruchu kamery
+target_camera_x = camera_x
+target_camera_y = camera_y
+interpolation_speed = 0.1
 
 while running:
     screen.fill(BLACK)
@@ -197,8 +202,11 @@ while running:
         print("Collision with boundary!")
         running = False
 
-    camera_x = head_x - (width // 2) / scale
-    camera_y = head_y - (height // 2) / scale
+    # Interpolacja ruchu kamery
+    target_camera_x = head_x - (width // 2) / scale
+    target_camera_y = head_y - (height // 2) / scale
+    camera_x += (target_camera_x - camera_x) * interpolation_speed
+    camera_y += (target_camera_y - camera_y) * interpolation_speed
 
     visible_width = width / scale
     visible_height = height / scale

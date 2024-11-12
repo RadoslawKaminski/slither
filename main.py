@@ -36,7 +36,6 @@ initial_size = 30
 growth_rate = 0.15
 snake_size = initial_size
 snake_speed = 12
-turn_factor = 9
 
 # Parametry jedzenia
 food_size = 15
@@ -144,6 +143,8 @@ while running:
     # Interpolacja skali
     current_scale = current_scale + (target_scale - current_scale) * interpolation_speed
     scale = current_scale
+
+    turn_factor = 70 / math.sqrt(snake_size)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

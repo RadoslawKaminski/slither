@@ -233,10 +233,15 @@ while running:
         pygame.draw.line(screen, (50, 50, 50), (0, int(screen_y)), (width, int(screen_y)))
 
     # Rysowanie węża
-    for segment in snake_body:
+    for segment in reversed(snake_body):
         x = (segment[0] - camera_x) * scale
         y = (segment[1] - camera_y) * scale
-        pygame.draw.circle(screen, GREEN, (int(x), int(y)), int(snake_size // 2 * scale))
+        scaled_segment_radius = int(snake_size // 2 * scale)
+        color_radius = scaled_segment_radius / 10
+        color_change = 240/10
+        for i in reversed(range(1, 10)):
+            circle_radius = color_radius*i
+            pygame.draw.circle(screen, (0, 255-color_change*i, 0), (int(x), int(y)), circle_radius)
 
     draw_eyes(new_head, angle, camera_x, camera_y, scale)
 
